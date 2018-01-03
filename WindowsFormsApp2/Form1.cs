@@ -15,6 +15,7 @@ namespace WindowsFormsApp2
 {
     public partial class Form1 : Form
     {
+        //连接数据库
         string str = ConfigurationManager.ConnectionStrings["cis"].ConnectionString;
 
         public Form1()
@@ -31,7 +32,10 @@ namespace WindowsFormsApp2
                 Directory.Delete(path,true);
             }
 
+            //获取所有表名
             string tablename = "select TABLE_NAME from all_tables where owner='LENOVO_CIS'";
+
+            //获取某个表的所有字段
             string sql = "select column_name,data_type,data_precision,data_scale from user_tab_columns t where t.TABLE_NAME='{0}'";
 
             DataTable dtTableName = GetData(tablename);
@@ -39,15 +43,20 @@ namespace WindowsFormsApp2
             {
                 DataTable dtFiled = GetData(string.Format(sql, dtTableName.Rows[i][0].ToString()));
 
+                //生成类名
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.AppendLine(GetNameSpace());
                 stringBuilder.AppendLine(GetClass("Advices.Entity", GetTitleCase(dtTableName.Rows[i][0].ToString().Replace("HD_", "").Replace("_", " ")).Replace(" ", "")));
+
+                //生成属性
                 for (int j = 0; j < dtFiled.Rows.Count; j++)
                 {
                     stringBuilder.AppendLine(GetBody(dtFiled.Rows[j][0].ToString(),
                         ConvertSqlToNetType(dtFiled.Rows[j][1].ToString(), NullToInt(dtFiled.Rows[j][3]))
                                              , GetTitleCase(dtFiled.Rows[j][0].ToString().Replace("_", " ")).Replace(" ", "")));
                 }
+
+                //生成结尾括号
                 stringBuilder.AppendLine(GetFoot());
 
 
@@ -65,6 +74,7 @@ namespace WindowsFormsApp2
 
         }
 
+        //空值转换
         public int NullToInt(object obj)
         {
             if (obj == null)
@@ -78,11 +88,13 @@ namespace WindowsFormsApp2
             return Convert.ToInt32(obj.ToString());
         }
 
+        //首字母大写转换
         public string GetTitleCase(string word)
         {
             return System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(word.ToLower());
         }
 
+        //sql类型转c#类型
         public string ConvertSqlToNetType(string sqlType, int SqlLength)
         {
             switch (sqlType)
@@ -100,6 +112,7 @@ namespace WindowsFormsApp2
             }
         }
 
+        //查询数据
         public DataTable GetData(string sql)
         {
             using (OracleConnection conn = new OracleConnection(str))
@@ -113,6 +126,7 @@ namespace WindowsFormsApp2
             }
         }
 
+        //拼接名称空间
         public string GetNameSpace()
         {
             StringBuilder strClass = new StringBuilder();
@@ -126,6 +140,7 @@ namespace WindowsFormsApp2
             return strClass.ToString();
         }
 
+        //拼接类名
         public string GetClass(string namespac, string className)
         {
             StringBuilder strClass = new StringBuilder();
@@ -136,6 +151,7 @@ namespace WindowsFormsApp2
             return strClass.ToString();
         }
 
+        //拼接属性
         public string GetBody(string DataField, string type, string filedName)
         {
             StringBuilder strb = new StringBuilder();
@@ -146,6 +162,8 @@ namespace WindowsFormsApp2
             return strb.ToString();
         }
 
+
+        //拼接尾部括号
         public string GetFoot()
         {
             StringBuilder strb = new StringBuilder();
