@@ -24,6 +24,13 @@ namespace WindowsFormsApp2
 
         private void button1_Click(object sender, EventArgs e)
         {
+            string path = AppDomain.CurrentDomain.BaseDirectory + "/class/";
+            //先清空文件夹
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path,true);
+            }
+
             string tablename = "select TABLE_NAME from all_tables where owner='LENOVO_CIS'";
             string sql = "select column_name,data_type,data_precision,data_scale from user_tab_columns t where t.TABLE_NAME='{0}'";
 
@@ -43,7 +50,7 @@ namespace WindowsFormsApp2
                 }
                 stringBuilder.AppendLine(GetFoot());
 
-                string path = AppDomain.CurrentDomain.BaseDirectory + "/class/";
+
                 string fileName = path + GetTitleCase(dtTableName.Rows[i][0].ToString().Replace("HD_","").Replace("_", " ")).Replace(" ", "") + ".cs";
 
                 if (!Directory.Exists(path))
@@ -53,6 +60,8 @@ namespace WindowsFormsApp2
 
                 File.AppendAllText(fileName, stringBuilder.ToString());
             }
+
+            MessageBox.Show("生成完成!");
 
         }
 
