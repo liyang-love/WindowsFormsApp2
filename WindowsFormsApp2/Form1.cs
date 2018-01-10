@@ -276,6 +276,11 @@ namespace WindowsFormsApp2
                 {
                     if (i == filedName.Count - 1)
                     {
+                        if (filedName[i].Item2 == "DateTime")
+                        {
+                            if (filedNew != "")
+                                filedNew = filedNew.Substring(0, filedNew.Length - 3) + ",\"";
+                        }
                         //filedNew = filedNew.Trim(',');
                         filedNew += GetFiled("item." + GetTitleCase(filedName[i].Item1.Replace("HD_", "").Replace("V_CPOE_", "").Replace("_", " ")).Replace(" ", ""),
                                 filedName[i].Item2, (i == filedName.Count - 1), i == 0);
@@ -283,6 +288,11 @@ namespace WindowsFormsApp2
                     }
                     else
                     {
+                        if (filedName[i].Item2 == "DateTime")
+                        {
+                            if (filedNew != "")
+                                filedNew = filedNew.Substring(0, filedNew.Length - 3) + ",\"";
+                        }
                         strb.AppendLine("            " + filedNew);
                     }
                     filedNew = string.Empty;
@@ -290,7 +300,11 @@ namespace WindowsFormsApp2
                 else if (i == filedName.Count - 1)
                 {
                     //filedNew = filedNew.Substring(0, filedNew.Length-3);
-
+                    if (filedName[i].Item2 == "DateTime")
+                    {
+                        if (filedNew != "")
+                            filedNew = filedNew.Substring(0, filedNew.Length - 3) + ",\"";
+                    }
                     filedNew += GetFiled("item." + GetTitleCase(filedName[i].Item1.Replace("HD_", "").Replace("V_CPOE_", "").Replace("_", " ")).Replace(" ", ""),
                                                     filedName[i].Item2, (i == filedName.Count - 1), i == 0);
                     strb.AppendLine("            " + filedNew.Substring(0, filedNew.Length - 3) + "\"");
