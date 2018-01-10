@@ -50,6 +50,9 @@ namespace WindowsFormsApp2
             {
                 DataTable dtFiled = GetData(string.Format(sql, dtTableName.Rows[i][0].ToString()));
 
+                //if ("HD_ADVICE_EXTEND" != dtTableName.Rows[i][0].ToString())
+                //{ continue; }
+
                 //生成类名
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.AppendLine(GetNameSpace());
@@ -273,9 +276,15 @@ namespace WindowsFormsApp2
                 {
                     if (i == filedName.Count - 1)
                     {
-                        filedNew = filedNew.Trim(',');
+                        //filedNew = filedNew.Trim(',');
+                        filedNew += GetFiled("item." + GetTitleCase(filedName[i].Item1.Replace("HD_", "").Replace("V_CPOE_", "").Replace("_", " ")).Replace(" ", ""),
+                                filedName[i].Item2, (i == filedName.Count - 1), i == 0);
+                        strb.AppendLine("            " + filedNew.Substring(0, filedNew.Length - 3) + "\"");
                     }
-                    strb.AppendLine("            " + filedNew);
+                    else
+                    {
+                        strb.AppendLine("            " + filedNew);
+                    }
                     filedNew = string.Empty;
                 }
                 else if (i == filedName.Count - 1)
