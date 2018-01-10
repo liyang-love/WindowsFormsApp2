@@ -84,7 +84,7 @@ namespace WindowsFormsApp2
                 List<Tuple<string, string>> filedsList = new List<Tuple<string, string>>();
                 for (int j = 0; j < dtFiled.Rows.Count; j++)
                 {
-                    filedsList.Add(new Tuple<string, string>(dtFiled.Rows[j][0].ToString(), 
+                    filedsList.Add(new Tuple<string, string>(dtFiled.Rows[j][0].ToString(),
                         ConvertSqlToNetType(dtFiled.Rows[j][1].ToString(), NullToInt(dtFiled.Rows[j][3]))));
                 }
                 RuleBuilder.AppendLine(GetMethod(GetTitleCase(dtTableName.Rows[i][0].ToString().Replace("HD_", "").Replace("V_CPOE_", "").Replace("_", " ")).Replace(" ", "")
@@ -240,14 +240,14 @@ namespace WindowsFormsApp2
             StringBuilder strb = new StringBuilder();
             strb.AppendLine("        public int Insert" + ClassName + "(List<" + ClassName + ">  " + ClassName + "s)");
             strb.AppendLine("        {");
-            strb.AppendLine("            string _sql = @\"INSERT INTO "+ tableName + "(");
+            strb.AppendLine("            string _sql = @\"INSERT INTO " + tableName + "(");
 
 
             List<string> filedList = new List<string>();
             string filed = string.Empty;
             for (int i = 0; i < filedName.Count; i++)
             {
-                if (filed.Length >= 60)
+                if (filed.Length >= 60 && i != filedName.Count - 1)
                 {
                     if (i == filedName.Count - 1)
                     {
@@ -256,7 +256,13 @@ namespace WindowsFormsApp2
                     strb.AppendLine("            " + filed);
                     filed = string.Empty;
                 }
-                filed += filedName[i].Item1+",";
+                else if (i == filedName.Count - 1)
+                {
+                    filed += filedName[i].Item1;
+                    strb.AppendLine("            " + filed);
+                    filed = string.Empty;
+                }
+                filed += filedName[i].Item1 + ",";
             }
 
             strb.AppendLine("            ) VALUES (");
@@ -272,12 +278,22 @@ namespace WindowsFormsApp2
                     strb.AppendLine("            " + filedNew);
                     filedNew = string.Empty;
                 }
+                else if (i == filedName.Count - 1)
+                {
+                    //filedNew = filedNew.Substring(0, filedNew.Length-3);
+
+                    filedNew += GetFiled("item." + GetTitleCase(filedName[i].Item1.Replace("HD_", "").Replace("V_CPOE_", "").Replace("_", " ")).Replace(" ", ""),
+                                                    filedName[i].Item2, (i == filedName.Count - 1), i == 0);
+                    strb.AppendLine("            " + filedNew.Substring(0, filedNew.Length - 3) + "\"");
+                    filedNew = string.Empty;
+                }
                 if (filedName[i].Item2 == "DateTime")
                 {
-                    filedNew= filedNew.Replace(",'\"", ",\"");
+                    if (filedNew != "")
+                        filedNew = filedNew.Substring(0, filedNew.Length - 3) + ",\"";
                 }
                 filedNew += GetFiled("item." + GetTitleCase(filedName[i].Item1.Replace("HD_", "").Replace("V_CPOE_", "").Replace("_", " ")).Replace(" ", ""),
-                                                filedName[i].Item2,(i == filedName.Count - 1), i == 0);
+                                                filedName[i].Item2, (i == filedName.Count - 1), i == 0);
             }
             strb.AppendLine("            +\");\";");
             strb.AppendLine("        }");
@@ -290,23 +306,23 @@ namespace WindowsFormsApp2
             return strb.ToString();
         }
 
-        public string GetUpdateMethod(string ClassName, List<Tuple<string, string>> filedName,string tableName)
+        public string GetUpdateMethod(string ClassName, List<Tuple<string, string>> filedName, string tableName)
         {
             StringBuilder strb = new StringBuilder();
             strb.AppendLine("        public int Update" + ClassName + "(List<" + ClassName + ">  " + ClassName + "s)");
             strb.AppendLine("        {");
             strb.AppendLine("            StringBuilder builder = new StringBuilder();");
-            strb.AppendLine("            builder.Append(\"UPDATE "+ tableName + " SET  \");");
+            strb.AppendLine("            builder.Append(\"UPDATE " + tableName + " SET  \");");
 
 
             List<string> filedList = new List<string>();
             string filed = string.Empty;
             for (int i = 0; i < filedName.Count; i++)
             {
-                strb.AppendLine("            builder.AppendFormat(\" "+ filedName[i].Item1 + " = "+ GetFileds(filedName[i].Item2, (i == filedName.Count - 1)) + "\",item."+ GetTitleCase(filedName[i].Item1.Replace("HD_", "").Replace("V_CPOE_", "").Replace("_", " ")).Replace(" ", "") + ");");
+                strb.AppendLine("            builder.AppendFormat(\" " + filedName[i].Item1 + " = " + GetFileds(filedName[i].Item2, (i == filedName.Count - 1)) + "\",item." + GetTitleCase(filedName[i].Item1.Replace("HD_", "").Replace("V_CPOE_", "").Replace("_", " ")).Replace(" ", "") + ");");
                 filed += filedName[i].Item1 + ",";
             }
-            strb.AppendLine("            builder.AppendFormat(\" WHERE " + filedName[0].Item1 + " = "+ GetFileds(filedName[0].Item2, true) + "; \", item."+ GetTitleCase(filedName[0].Item1.Replace("HD_", "").Replace("V_CPOE_", "").Replace("_", " ")).Replace(" ", "") + ");");
+            strb.AppendLine("            builder.AppendFormat(\" WHERE " + filedName[0].Item1 + " = " + GetFileds(filedName[0].Item2, true) + "; \", item." + GetTitleCase(filedName[0].Item1.Replace("HD_", "").Replace("V_CPOE_", "").Replace("_", " ")).Replace(" ", "") + ");");
             strb.AppendLine("        }");
 
             strb.AppendLine("        ");
@@ -314,12 +330,12 @@ namespace WindowsFormsApp2
         }
 
 
-        public string GetFiled(string filedName, string type,bool IsLast,bool isFirst)
+        public string GetFiled(string filedName, string type, bool IsLast, bool isFirst)
         {
             string filed = string.Empty;
             if (isFirst)
             {
-                filed += "'\" + ";
+                filed += "'\" ";
             }
             if (type == "string")
             {
@@ -331,7 +347,7 @@ namespace WindowsFormsApp2
             }
             else
             {
-                filed +="+"+ filedName + "+\"','\"";
+                filed += "+" + filedName + "+\"','\"";
             }
             if (IsLast)
             {
@@ -345,7 +361,7 @@ namespace WindowsFormsApp2
             string filed = string.Empty;
             if (type == "string")
             {
-                filed=  "'{0}',";
+                filed = "'{0}',";
             }
             else if (type == "DateTime")
             {
