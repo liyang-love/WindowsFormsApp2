@@ -42,8 +42,8 @@ namespace WindowsFormsApp2
             string sql = "select column_name,data_type,data_precision,data_scale from user_tab_columns t where t.TABLE_NAME='{0}'";
 
             DataTable dtTableName = GetData(tablename);
-            //for (int i = 0; i < dtTableName.Rows.Count; i++)
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < dtTableName.Rows.Count; i++)
+            //for (int i = 0; i < 1; i++)
             {
                 DataTable dtFiled = GetData(string.Format(sql, dtTableName.Rows[i][0].ToString()));
 
@@ -53,7 +53,7 @@ namespace WindowsFormsApp2
                 //生成类名
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.AppendLine(GetNameSpace());
-                stringBuilder.AppendLine(GetClass("CPOE.Entity", GetTitleCase(dtTableName.Rows[i][0].ToString().Replace("HD_", "").Replace("V_CPOE_", "").Replace("_", " ")).Replace(" ", "")));
+                stringBuilder.AppendLine(GetClass("CPOE.Entities", GetTitleCase(dtTableName.Rows[i][0].ToString().Replace("HD_", "").Replace("V_CPOE_", "").Replace("_", " ")).Replace(" ", "")));
 
                 //生成属性
                 for (int j = 0; j < dtFiled.Rows.Count; j++)
